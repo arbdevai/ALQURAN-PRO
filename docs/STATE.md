@@ -26,6 +26,9 @@
 - [x] Setup Release Keystore & 4 GitHub Secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`).
 
 ## Catatan Bug Terselesaikan & Workaround (Anti-Mengulang Masalah)
+- *Catatan CI Run #1:*
+  1. `Unresolved reference 'animateFloat'` pada `SkeletonComponents.kt`: wajib menyertakan import eksplisit `androidx.compose.animation.core.animateFloat`.
+  2. `items(4)` dipanggil di dalam non-lazy layout `Column` pada `SurahDetailScreen.kt`: layout vertikal standar harus menggunakan `repeat(4) { ... }`, bukan extension `items` dari `LazyListScope`.
 - *Catatan API MyQuran v3:* ID kota berupa hash 32-karakter (`58a2fc6ed39fd083f55d4182bf88826d`). Format jadwal dikembalikan dalam map tanggal `"YYYY-MM-DD"`.
 - *Catatan Linter Kotlin:* Hindari nested implicit `it` di dalam lambda yang sudah memiliki parameter bernama; beri nama eksplisit (`current ->`) pada `_uiState.update`.
 

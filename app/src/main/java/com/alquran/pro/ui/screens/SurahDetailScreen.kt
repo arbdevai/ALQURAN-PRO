@@ -93,7 +93,7 @@ fun SurahDetailScreen(
                         .size(60.dp),
                     shape = RoundedCornerShape(16.dp)
                 )
-                items(4) {
+                repeat(4) {
                     SkeletonBox(
                         modifier = Modifier
                             .fillMaxWidth()
