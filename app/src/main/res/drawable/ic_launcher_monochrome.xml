@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Pure White Silhouette for System Dynamic Color Engine -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54.91,26.93 L67.8,49.37 L63.86,56.5 L54.91,40.43 L49.45,49.83 L67.35,81.07 L43.84,81.07 L38.23,75.0 L55.82,75.0 L41.41,49.37 Z M37.17,56.05 L40.96,62.57 L30.19,81.07 L22.0,81.07 Z M71.9,56.35 L86.0,81.07 L77.81,81.07 L67.8,63.02 Z" />
+</vector>

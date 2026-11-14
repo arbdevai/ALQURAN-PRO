@@ -1,0 +1,35 @@
+# Project State & Session Memory
+
+## Status Saat Ini
+- **Fase Aktif:** Fase 2: Autopilot Delivery & GitHub Actions CI Build
+- **Versi Terakhir:** v1.0.0 (versionCode: 1)
+- **Status CI Terakhir:** Push Perdana Siap Diluncurkan
+
+## Fitur yang Selesai Tuntas (Vertical Slices)
+- [x] Inisiasi Proyek Android Compose (Single Activity, Gradle Catalog, Android 15/16 Ready).
+- [x] Konfigurasi CI/CD GitHub Actions (`build-apk.yml`) dengan Auto-Release & Signing.
+- [x] Dokumen PRD dan Kontrak Desain (True OLED Dark, Zero On-screen Back Button, Zero AI Slop).
+- [x] DTO & Model Data EQuran v2 (`SuratSummaryDto`, `SuratDetailDto`, `AyatDto`, `TafsirDto`).
+- [x] DTO & Model Data MyQuran v3 (`KotaDto`, `JadwalResponse`, `JadwalHariIniDto`).
+- [x] Network Layer (Retrofit, OkHttp, Kotlinx Serialization, Caching).
+- [x] Persistence Layer (DataStore Preferences & DiskCacheManager untuk akses offline).
+- [x] Repositories (`QuranRepository`, `PrayerRepository` dengan kalkulasi hitung mundur waktu sholat otomatis).
+- [x] Native Audio Engine Media3 ExoPlayer (`QuranAudioPlayer` untuk murottal per ayat dan penuh surat).
+- [x] UI Design System OLED Murni (`#000000`, `#121212`, `#1E1E1E`, Emerald & Gold Accents).
+- [x] Shimmer Skeleton Loaders (`SkeletonBox`, `shimmerEffect`).
+- [x] Floating Dock Bar Navigation & Zero On-Screen Back Button (Navigasi kembali murni gesture native Android via `BackHandler`).
+- [x] Layar Al-Qur'an (`QuranListScreen` dengan pencarian dan kartu terakhir dibaca).
+- [x] Layar Baca Ayat (`SurahDetailScreen` dengan audio player bar dan bookmark).
+- [x] Layar Jadwal Sholat (`PrayerTimesScreen` dengan hero countdown dan pencarian kota MyQuran v3).
+- [x] Layar Tersimpan (`BookmarksScreen`).
+- [x] Lolos Verifikasi Sintaksis & Keamanan Memori Kotlin (0 Hard Errors).
+- [x] Setup Release Keystore & 4 GitHub Secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`).
+
+## Catatan Bug Terselesaikan & Workaround (Anti-Mengulang Masalah)
+- *Catatan API MyQuran v3:* ID kota berupa hash 32-karakter (`58a2fc6ed39fd083f55d4182bf88826d`). Format jadwal dikembalikan dalam map tanggal `"YYYY-MM-DD"`.
+- *Catatan Linter Kotlin:* Hindari nested implicit `it` di dalam lambda yang sudah memiliki parameter bernama; beri nama eksplisit (`current ->`) pada `_uiState.update`.
+
+## Tugas Aktif Selanjutnya (Next Actions)
+1. Commit dan push dengan format rilis `Release v1.0.0: ...` untuk memicu publish tagged release.
+2. Monitor workflow CI via `gh run watch`.
+3. Ambil dan serahkan link download APK jadi dari GitHub Release ke pengguna.
