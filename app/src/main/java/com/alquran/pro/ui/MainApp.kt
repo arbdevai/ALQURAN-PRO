@@ -28,9 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alquran.pro.ui.components.AudioMiniPlayer
+import com.alquran.pro.ui.components.CityPickerDialog
 import com.alquran.pro.ui.components.FloatingDockBar
 import com.alquran.pro.ui.components.MainTab
 import com.alquran.pro.ui.screens.BookmarksScreen
+import com.alquran.pro.ui.screens.HomeScreen
 import com.alquran.pro.ui.screens.PrayerTimesScreen
 import com.alquran.pro.ui.screens.QuranListScreen
 import com.alquran.pro.ui.screens.SurahDetailScreen
@@ -49,7 +51,7 @@ fun MainApp(
     val bookmarks by quranViewModel.bookmarks.collectAsStateWithLifecycle()
     val audioState by quranViewModel.audioPlayer.playerState.collectAsStateWithLifecycle()
 
-    var currentTab by remember { mutableStateOf(MainTab.QURAN) }
+    var currentTab by remember { mutableStateOf(MainTab.HOME) }
     var viewingSurahNomor by remember { mutableStateOf<Int?>(null) }
 
     // Navigasi Kembali Murni Menggunakan Gesture Native Android
@@ -58,9 +60,9 @@ fun MainApp(
             viewingSurahNomor = null
             quranViewModel.clearSurahDetail()
         }
-    } else if (currentTab != MainTab.QURAN) {
+    } else if (currentTab != MainTab.HOME) {
         BackHandler {
-            currentTab = MainTab.QURAN
+            currentTab = MainTab.HOME
         }
     }
 
@@ -120,6 +122,18 @@ fun MainApp(
                             .statusBarsPadding()
                     ) {
                         when (currentTab) {
+                            MainTab.HOME -> {
+                                HomeScreen(
+                                    prayerDashboard = prayerState.dashboard,
+                                    lastRead = lastRead,
+                                    onNavigateTab = { currentTab = it },
+                                    onContinueReading = { nomor ->
+                                        viewingSurahNomor = nomor
+                                        quranViewModel.loadSurahDetail(nomor)
+                                    },
+                                    onOpenPrayerCityPicker = { prayerViewModel.openCityDialog() }
+                                )
+                            }
                             MainTab.QURAN -> {
                                 QuranListScreen(
                                     surahs = quranState.filteredSurahs,
@@ -162,6 +176,18 @@ fun MainApp(
                         }
                     }
                 }
+            }
+
+            // Dialog Pencarian Kota Global jika dibuka dari Home
+            if (prayerState.showCityDialog && currentTab == MainTab.HOME) {
+                CityPickerDialog(
+                    query = prayerState.citySearchQuery,
+                    results = prayerState.searchResults,
+                    isSearching = prayerState.isSearching,
+                    onQueryChange = { prayerViewModel.onCityQueryChange(it) },
+                    onCitySelected = { kota -> prayerViewModel.selectCity(kota) },
+                    onDismiss = { prayerViewModel.closeCityDialog() }
+                )
             }
 
             // Bottom Overlay: Mini Player & Floating Dock

@@ -44,6 +44,12 @@
   - Indikator sholat aktif saat ini (Imsak, Subuh, Terbit, Dhuha, Dzuhur, Ashar, Maghrib, Isya).
   - Fitur ganti kota/kabupaten dengan live search ke endpoint MyQuran v3.
   - Cache jadwal harian untuk keandalan offline.
-- [ ] **Fitur 4: Navigasi Gestur & Hub Layar**
+- [x] **Fitur 4: Navigasi Gestur & Hub Layar**
   - Modern Floating Dock Bar untuk navigasi cepat (Al-Qur'an, Jadwal Sholat, Bookmark & Pengaturan).
   - Penanganan `BackHandler` mulus tanpa tombol kembali statis di antarmuka layar.
+- [x] **Fitur 5: Dashboard Beranda Bento Grid & Set Ikon Lucide Murni**
+  - Halaman Beranda (*HomeScreen*) sebagai central hub modular.
+  - Kartu Hero Sholat Terdekat (MyQuran v3) dengan hitung mundur waktu sholat dan ganti kota instan.
+  - Kartu Resume Cepat (*Last Read Quick Access*).
+  - Kisi Menu Kotak-Kotak (*Bento Grid 2 Kolom*) untuk navigasi fitur cepat (Al-Qur'an, Jadwal Sholat, Tersimpan, Pencarian, Arah Kiblat, Info Sumber Kemenag).
+  - Ikon Vektor Lucide murni berbasis Android XML Vector Drawable (`res/drawable/ic_lucide_*`).
