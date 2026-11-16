@@ -1,10 +1,10 @@
 # Project State & Session Memory
 
 ## Status Saat Ini
-- **Fase Aktif:** Fase 4: Rilis v1.2.0 (Compact Bento Tiles, Info Developer Sahal Arbani, & In-App Updater)
+- **Fase Aktif:** Selesai (Release v1.2.0 Sukses Diterbitkan & Diunduh ke HP)
 - **Versi Terakhir:** v1.2.0 (versionCode: 3)
-- **Status CI Terakhir:** Menunggu Push Rilis v1.2.0
-- **Tautan Rilis v1.1.0:** https://github.com/arbdevai/ALQURAN-PRO/releases/tag/v1.1.0
+- **Status CI Terakhir:** Hijau (Build signed release APK & GitHub Release Publik Berhasil)
+- **Tautan Rilis v1.2.0:** https://github.com/arbdevai/ALQURAN-PRO/releases/tag/v1.2.0
 
 ## Fitur yang Selesai Tuntas (Vertical Slices)
 - [x] Inisiasi Proyek Android Compose (Single Activity, Gradle Catalog, Android 15/16 Ready).
@@ -27,6 +27,7 @@
 - [x] Navigasi Gestur Murni Tanpa Tombol Kembali di Layar (Mengandalkan `BackHandler` dan native system back gesture).
 - [x] Layar Al-Qur'an, Baca Ayat, Jadwal Sholat, dan Bookmark.
 - [x] Lolos Verifikasi Sintaksis & Keamanan Memori Kotlin (0 Hard Errors).
+- [x] Unduhan APK Rilis ARM64 Langsung ke `/sdcard/Download/AlQuranPro-v1.2.0-arm64.apk`.
 
 ## Catatan Bug Terselesaikan & Workaround (Anti-Mengulang Masalah)
 - *Catatan CI Run #1:*
@@ -34,8 +35,3 @@
   2. `items(4)` dipanggil di dalam non-lazy layout `Column` pada `SurahDetailScreen.kt`: layout vertikal standar harus menggunakan `repeat(4) { ... }`, bukan extension `items` dari `LazyListScope`.
 - *Catatan API MyQuran v3:* ID kota berupa hash 32-karakter (`58a2fc6ed39fd083f55d4182bf88826d`). Format jadwal dikembalikan dalam map tanggal `"YYYY-MM-DD"`.
 - *Catatan Linter Kotlin:* Hindari nested implicit `it` di dalam lambda yang sudah memiliki parameter bernama; beri nama eksplisit (`current ->`) pada `_uiState.update`.
-
-## Tugas Aktif Selanjutnya (Next Actions)
-1. Commit rilis dengan format `Release v1.2.0: ...` untuk memicu publish tagged release APK di GitHub Actions.
-2. Pantau GitHub Actions via `gh run watch`.
-3. Unduh berkas rilis `AlQuranPro-v1.2.0-arm64.apk` langsung ke `/mnt/sdcard/Download/` di HP pengguna.
