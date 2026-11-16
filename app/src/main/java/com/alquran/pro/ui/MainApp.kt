@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.alquran.pro.ui.components.AboutAppDialog
 import com.alquran.pro.ui.components.AudioMiniPlayer
 import com.alquran.pro.ui.components.CityPickerDialog
 import com.alquran.pro.ui.components.FloatingDockBar
@@ -39,20 +39,24 @@ import com.alquran.pro.ui.screens.SurahDetailScreen
 import com.alquran.pro.ui.theme.OledBlack
 import com.alquran.pro.ui.viewmodel.PrayerViewModel
 import com.alquran.pro.ui.viewmodel.QuranViewModel
+import com.alquran.pro.updater.UpdateViewModel
 
 @Composable
 fun MainApp(
     quranViewModel: QuranViewModel = viewModel(),
-    prayerViewModel: PrayerViewModel = viewModel()
+    prayerViewModel: PrayerViewModel = viewModel(),
+    updateViewModel: UpdateViewModel = viewModel()
 ) {
     val quranState by quranViewModel.uiState.collectAsStateWithLifecycle()
     val prayerState by prayerViewModel.uiState.collectAsStateWithLifecycle()
     val lastRead by quranViewModel.lastRead.collectAsStateWithLifecycle()
     val bookmarks by quranViewModel.bookmarks.collectAsStateWithLifecycle()
     val audioState by quranViewModel.audioPlayer.playerState.collectAsStateWithLifecycle()
+    val updateState by updateViewModel.uiState.collectAsStateWithLifecycle()
 
     var currentTab by remember { mutableStateOf(MainTab.HOME) }
     var viewingSurahNomor by remember { mutableStateOf<Int?>(null) }
+    var showAboutDialog by remember { mutableStateOf(false) }
 
     // Navigasi Kembali Murni Menggunakan Gesture Native Android
     if (viewingSurahNomor != null) {
@@ -131,7 +135,8 @@ fun MainApp(
                                         viewingSurahNomor = nomor
                                         quranViewModel.loadSurahDetail(nomor)
                                     },
-                                    onOpenPrayerCityPicker = { prayerViewModel.openCityDialog() }
+                                    onOpenPrayerCityPicker = { prayerViewModel.openCityDialog() },
+                                    onOpenAboutDialog = { showAboutDialog = true }
                                 )
                             }
                             MainTab.QURAN -> {
@@ -187,6 +192,20 @@ fun MainApp(
                     onQueryChange = { prayerViewModel.onCityQueryChange(it) },
                     onCitySelected = { kota -> prayerViewModel.selectCity(kota) },
                     onDismiss = { prayerViewModel.closeCityDialog() }
+                )
+            }
+
+            // Dialog Info & Pembaruan Aplikasi (Tentang Sahal Arbani, Sumber API & Updater)
+            if (showAboutDialog) {
+                AboutAppDialog(
+                    updateState = updateState,
+                    onCheckUpdate = { updateViewModel.checkForUpdates() },
+                    onStartDownload = { updateViewModel.startDownload(it) },
+                    onInstallUpdate = { updateViewModel.installApk(it) },
+                    onDismiss = {
+                        showAboutDialog = false
+                        updateViewModel.resetState()
+                    }
                 )
             }
 

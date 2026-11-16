@@ -47,6 +47,7 @@ fun HomeScreen(
     onNavigateTab: (MainTab) -> Unit,
     onContinueReading: (surahNomor: Int) -> Unit,
     onOpenPrayerCityPicker: () -> Unit,
+    onOpenAboutDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -277,11 +278,11 @@ fun HomeScreen(
             )
         }
 
-        // 5. Bento Grid Kotak-kotak (Baris 1)
+        // 5. Bento Grid Kotak-kotak Kompak (Baris 1)
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BentoMenuCard(
                     title = "Al-Qur'an",
@@ -303,11 +304,11 @@ fun HomeScreen(
             }
         }
 
-        // 6. Bento Grid Kotak-kotak (Baris 2)
+        // 6. Bento Grid Kotak-kotak Kompak (Baris 2)
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 BentoMenuCard(
                     title = "Tersimpan",
@@ -319,37 +320,11 @@ fun HomeScreen(
                 )
 
                 BentoMenuCard(
-                    title = "Cari Surat",
-                    subtitle = "Pencarian Cepat",
-                    iconRes = R.drawable.ic_lucide_search,
-                    accentColor = EmeraldPrimary,
-                    onClick = { onNavigateTab(MainTab.QURAN) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-
-        // 7. Bento Grid Kotak-kotak (Baris 3)
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                BentoMenuCard(
-                    title = "Arah Kiblat",
-                    subtitle = "Pedoman Sholat",
-                    iconRes = R.drawable.ic_lucide_compass,
-                    accentColor = EmeraldPrimary,
-                    onClick = { onNavigateTab(MainTab.PRAYER) },
-                    modifier = Modifier.weight(1f)
-                )
-
-                BentoMenuCard(
-                    title = "Info & Sumber",
-                    subtitle = "Kemenag RI Resmi",
+                    title = "Info & Update",
+                    subtitle = "Sahal Arbani • API",
                     iconRes = R.drawable.ic_lucide_info,
-                    accentColor = TextMuted,
-                    onClick = { onOpenPrayerCityPicker() },
+                    accentColor = EmeraldPrimary,
+                    onClick = { onOpenAboutDialog() },
                     modifier = Modifier.weight(1f)
                 )
             }

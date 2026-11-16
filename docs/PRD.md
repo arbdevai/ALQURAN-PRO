@@ -51,5 +51,12 @@
   - Halaman Beranda (*HomeScreen*) sebagai central hub modular.
   - Kartu Hero Sholat Terdekat (MyQuran v3) dengan hitung mundur waktu sholat dan ganti kota instan.
   - Kartu Resume Cepat (*Last Read Quick Access*).
-  - Kisi Menu Kotak-Kotak (*Bento Grid 2 Kolom*) untuk navigasi fitur cepat (Al-Qur'an, Jadwal Sholat, Tersimpan, Pencarian, Arah Kiblat, Info Sumber Kemenag).
-  - Ikon Vektor Lucide murni berbasis Android XML Vector Drawable (`res/drawable/ic_lucide_*`).
+  - Kisi Menu Kotak-Kotak Kompak (*Compact Bento Tiles 2 Kolom, ~68dp*) untuk efisiensi ruang layar.
+  - Set Ikon Vektor Lucide murni berbasis Android XML Vector Drawable (`res/drawable/ic_lucide_*`).
+  - Dialog Info Aplikasi & Sumber Resmi (Profil Developer: Sahal Arbani, EQuran v2 Kemenag RI, MyQuran v3).
+- [x] **Fitur 6: In-App Updater Mandiri (GitHub Releases Integration)**
+  - Modul pembaruan mandiri otomatis tanpa Google Play Store ([InAppUpdateManager.kt](file:///home/coder/projects/ALQURAN-PRO/app/src/main/java/com/alquran/pro/updater/InAppUpdateManager.kt)).
+  - Deteksi arsitektur CPU otomatis (`Build.SUPPORTED_ABIS`) khusus ARM64 (`arm64-v8a`) dan ARM32 (`armeabi-v7a`).
+  - Pengunduhan streaming OkHttp terisolasi ke file sementara `.part` dengan pemantauan progres persentase.
+  - Verifikasi integritas APK 4 lapis (`isApkValid`: ukuran fisik > 10MB, DEX & Signature parsing, strict package name match, SemVer comparison).
+  - Pemicu instalasi via Android `FileProvider` dan pengecekan izin `ACTION_MANAGE_UNKNOWN_APP_SOURCES`.

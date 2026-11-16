@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alquran.pro.ui.theme.DarkSurface
@@ -29,6 +30,11 @@ import com.alquran.pro.ui.theme.DarkSurfaceContainer
 import com.alquran.pro.ui.theme.TextHighContrast
 import com.alquran.pro.ui.theme.TextMuted
 
+/**
+ * Compact Bento Tile Card:
+ * Desain ramping (tinggi ~68dp) horizontal, hemat ruang vertikal layar,
+ * bebas AI slop, dan menggunakan ikon Lucide vektor murni.
+ */
 @Composable
 fun BentoMenuCard(
     title: String,
@@ -40,20 +46,21 @@ fun BentoMenuCard(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(18.dp))
             .background(DarkSurface)
-            .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(20.dp))
+            .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(18.dp))
             .clickable(onClick = onClick)
-            .padding(18.dp)
+            .padding(horizontal = 14.dp, vertical = 13.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Icon Container dengan Lucide Vector murni
+            // Icon Container Lucide Vector
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(40.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(DarkSurfaceContainer)
                     .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(12.dp)),
@@ -63,27 +70,30 @@ fun BentoMenuCard(
                     painter = painterResource(id = iconRes),
                     contentDescription = title,
                     tint = accentColor,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = title,
                     color = TextHighContrast,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = subtitle,
                     color = TextMuted,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.padding(top = 3.dp)
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
             }
         }
