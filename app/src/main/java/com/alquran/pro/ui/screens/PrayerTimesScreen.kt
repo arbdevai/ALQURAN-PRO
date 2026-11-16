@@ -1,5 +1,8 @@
 package com.alquran.pro.ui.screens
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,20 +13,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alquran.pro.data.location.LocationHelper
 import com.alquran.pro.data.model.KotaDto
 import com.alquran.pro.data.model.PrayerDashboardState
 import com.alquran.pro.ui.components.CityPickerDialog
-import com.alquran.pro.ui.components.PrayerCountdownHero
-import com.alquran.pro.ui.components.PrayerTimeRow
 import com.alquran.pro.ui.components.SkeletonBox
+import com.alquran.pro.ui.components.UnifiedPrayerScheduleCard
 import com.alquran.pro.ui.theme.EmeraldPrimary
 import com.alquran.pro.ui.theme.OledBlack
 import com.alquran.pro.ui.theme.TextHighContrast
@@ -36,13 +39,41 @@ fun PrayerTimesScreen(
     citySearchQuery: String,
     citySearchResults: List<KotaDto>,
     isSearchingCity: Boolean,
+    isDetectingLocation: Boolean,
+    locationMessage: String?,
     onRefresh: () -> Unit,
+    onAutoDetectLocation: () -> Unit,
     onOpenCityDialog: () -> Unit,
     onCloseCityDialog: () -> Unit,
     onCitySearchQueryChange: (String) -> Unit,
     onCitySelected: (KotaDto) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (fineGranted || coarseGranted) {
+            onAutoDetectLocation()
+        }
+    }
+
+    val handleAutoDetectClick = {
+        if (LocationHelper.hasLocationPermission(context)) {
+            onAutoDetectLocation()
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -78,7 +109,7 @@ fun PrayerTimesScreen(
             }
 
             if (state.isLoading && state.slots.isEmpty()) {
-                // Skeleton Loading
+                // Skeleton Loading: Wadah kartu tunggal
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -88,17 +119,9 @@ fun PrayerTimesScreen(
                     SkeletonBox(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .size(170.dp),
+                            .size(520.dp),
                         shape = RoundedCornerShape(22.dp)
                     )
-                    repeat(6) {
-                        SkeletonBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .size(56.dp),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                    }
                 }
             } else {
                 LazyColumn(
@@ -106,36 +129,22 @@ fun PrayerTimesScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // Hero Countdown Card
+                    // Satu Kartu Tunggal untuk Seluruh Jadwal Hari Ini
                     item {
-                        PrayerCountdownHero(
+                        UnifiedPrayerScheduleCard(
                             state = state,
+                            isDetectingLocation = isDetectingLocation,
+                            locationMessage = locationMessage,
+                            onAutoDetectLocationClick = handleAutoDetectClick,
                             onChangeCityClick = onOpenCityDialog,
                             onRefreshClick = onRefresh
                         )
-                    }
-
-                    // Section Title
-                    item {
-                        Text(
-                            text = "JADWAL HARI INI",
-                            color = TextMuted,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                            modifier = Modifier.padding(top = 10.dp, bottom = 4.dp)
-                        )
-                    }
-
-                    // List of 8 Prayer Slots
-                    items(state.slots, key = { it.name }) { slot ->
-                        PrayerTimeRow(slot = slot)
                     }
                 }
             }
         }
 
-        // Dialog Pencarian Kota
+        // Dialog Pencarian Kota Manual
         if (showCityDialog) {
             CityPickerDialog(
                 query = citySearchQuery,

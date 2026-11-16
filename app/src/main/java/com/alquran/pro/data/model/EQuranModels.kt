@@ -1,7 +1,16 @@
 package com.alquran.pro.data.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 @Serializable
 data class SuratListResponse(
@@ -40,7 +49,9 @@ data class SuratDetailDto(
     @SerialName("deskripsi") val deskripsi: String = "",
     @SerialName("audioFull") val audioFull: Map<String, String> = emptyMap(),
     @SerialName("ayat") val ayat: List<AyatDto> = emptyList(),
+    @Serializable(with = SuratNavSerializer::class)
     @SerialName("suratSelanjutnya") val suratSelanjutnya: SuratNavDto? = null,
+    @Serializable(with = SuratNavSerializer::class)
     @SerialName("suratSebelumnya") val suratSebelumnya: SuratNavDto? = null
 )
 
@@ -51,6 +62,33 @@ data class SuratNavDto(
     @SerialName("namaLatin") val namaLatin: String = "",
     @SerialName("jumlahAyat") val jumlahAyat: Int = 0
 )
+
+/**
+ * Custom serializer untuk menangani API EQuran v2 yang mengembalikan `false` (boolean)
+ * alih-alih objek pada surat pertama (Al-Fatihah) atau surat terakhir (An-Nas).
+ */
+object SuratNavSerializer : KSerializer<SuratNavDto?> {
+    override val descriptor: SerialDescriptor =
+        buildClassSerialDescriptor("SuratNavNullable")
+
+    override fun deserialize(decoder: Decoder): SuratNavDto? {
+        val jsonDecoder = decoder as? JsonDecoder ?: return null
+        val element = jsonDecoder.decodeJsonElement()
+        if (element is JsonObject) {
+            return jsonDecoder.json.decodeFromJsonElement(SuratNavDto.serializer(), element)
+        }
+        return null
+    }
+
+    override fun serialize(encoder: Encoder, value: SuratNavDto?) {
+        val jsonEncoder = encoder as? JsonEncoder ?: return
+        if (value != null) {
+            jsonEncoder.encodeJsonElement(jsonEncoder.json.encodeToJsonElement(SuratNavDto.serializer(), value))
+        } else {
+            jsonEncoder.encodeJsonElement(JsonPrimitive(false))
+        }
+    }
+}
 
 @Serializable
 data class AyatDto(

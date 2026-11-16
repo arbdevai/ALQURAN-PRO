@@ -7,25 +7,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alquran.pro.R
 import com.alquran.pro.data.model.PrayerDashboardState
 import com.alquran.pro.data.model.PrayerTimeSlot
 import com.alquran.pro.ui.theme.DarkSurface
@@ -39,9 +44,16 @@ import com.alquran.pro.ui.theme.TextHighContrast
 import com.alquran.pro.ui.theme.TextMediumContrast
 import com.alquran.pro.ui.theme.TextMuted
 
+/**
+ * Kartu Tunggal Terpadu Jadwal Sholat Hari Ini.
+ * Menggabungkan deteksi lokasi, hitung mundur, dan jadwal 8 waktu dalam 1 wadah rapi efisien.
+ */
 @Composable
-fun PrayerCountdownHero(
+fun UnifiedPrayerScheduleCard(
     state: PrayerDashboardState,
+    isDetectingLocation: Boolean,
+    locationMessage: String?,
+    onAutoDetectLocationClick: () -> Unit,
     onChangeCityClick: () -> Unit,
     onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -52,23 +64,25 @@ fun PrayerCountdownHero(
             .clip(RoundedCornerShape(22.dp))
             .background(DarkSurface)
             .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(22.dp))
-            .padding(20.dp)
+            .padding(18.dp)
     ) {
-        // Bar Lokasi & Tombol Ganti Kota
+        // 1. Bar Lokasi & Aksi (Deteksi GPS, Ganti Kota, Refresh)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Chip Nama Kota
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .weight(1f, fill = false)
                     .clip(RoundedCornerShape(10.dp))
                     .clickable(onClick = onChangeCityClick)
-                    .padding(vertical = 4.dp, horizontal = 6.dp)
+                    .padding(vertical = 4.dp, horizontal = 4.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.LocationOn,
+                    painter = painterResource(R.drawable.ic_lucide_map_pin),
                     contentDescription = "Lokasi Kota",
                     tint = EmeraldPrimary,
                     modifier = Modifier.size(18.dp)
@@ -78,6 +92,7 @@ fun PrayerCountdownHero(
                     color = TextHighContrast,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                     modifier = Modifier.padding(start = 6.dp, end = 6.dp)
                 )
                 Icon(
@@ -88,19 +103,71 @@ fun PrayerCountdownHero(
                 )
             }
 
+            // Tombol Aksi GPS & Refresh
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Tombol GPS Auto Detect
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(if (isDetectingLocation) EmeraldContainer else DarkSurfaceContainer)
+                        .clickable(enabled = !isDetectingLocation, onClick = onAutoDetectLocationClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isDetectingLocation) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = EmeraldPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_lucide_crosshair),
+                            contentDescription = "Deteksi Lokasi GPS Otomatis",
+                            tint = EmeraldPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+
+                // Tombol Refresh
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(DarkSurfaceContainer)
+                        .clickable(onClick = onRefreshClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = "Muat Ulang Jadwal",
+                        tint = TextMediumContrast,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
+        // Pesan Status Deteksi Lokasi (Jika ada)
+        if (!locationMessage.isNullOrBlank()) {
             Box(
                 modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
                     .background(DarkSurfaceContainer)
-                    .clickable(onClick = onRefreshClick),
-                contentAlignment = Alignment.Center
+                    .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(8.dp))
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Muat Ulang Jadwal",
-                    tint = TextMediumContrast,
-                    modifier = Modifier.size(16.dp)
+                Text(
+                    text = locationMessage,
+                    color = EmeraldPrimary,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -115,15 +182,15 @@ fun PrayerCountdownHero(
             )
         }
 
-        // Hero Info Waktu Sholat Berikutnya
+        // 2. Sub-Hero Menuju Sholat Berikutnya
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 12.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(DarkSurfaceContainer)
                 .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
-                .padding(18.dp)
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -141,20 +208,19 @@ fun PrayerCountdownHero(
                     Text(
                         text = state.nextPrayerName.ifBlank { "Menghitung..." },
                         color = TextHighContrast,
-                        fontSize = 26.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                     Text(
                         text = state.countdownText,
                         color = EmeraldPrimary,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
 
-                // Badge Indikator
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
@@ -171,54 +237,97 @@ fun PrayerCountdownHero(
                 }
             }
         }
+
+        // 3. Garis Pemisah Halus
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 14.dp),
+            thickness = 1.dp,
+            color = DarkSurfaceBorder
+        )
+
+        // 4. Header Judul Sub-bagian
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "JADWAL SHOLAT HARI INI",
+                color = TextMuted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+            Text(
+                text = "8 Waktu",
+                color = TextMuted,
+                fontSize = 11.sp
+            )
+        }
+
+        // 5. Daftar 8 Waktu Sholat di dalam Satu Card yang Sama
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            state.slots.forEach { slot ->
+                UnifiedPrayerSlotRow(slot = slot)
+            }
+        }
     }
 }
 
 @Composable
-fun PrayerTimeRow(
+fun UnifiedPrayerSlotRow(
     slot: PrayerTimeSlot,
     modifier: Modifier = Modifier
 ) {
     val isHighlighted = slot.isNext
-    val cardBg = if (isHighlighted) EmeraldContainer else DarkSurface
-    val borderColor = if (isHighlighted) EmeraldPrimary else DarkSurfaceBorder
+    val rowBg = if (isHighlighted) EmeraldContainer.copy(alpha = 0.55f) else DarkSurfaceContainer.copy(alpha = 0.45f)
+    val rowBorder = if (isHighlighted) EmeraldPrimary else Color.Transparent
     val timeColor = if (isHighlighted) TextHighContrast else if (slot.isCurrent) GoldAccent else TextHighContrast
     val nameColor = if (isHighlighted) TextHighContrast else TextMediumContrast
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(cardBg)
-            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .clip(RoundedCornerShape(12.dp))
+            .background(rowBg)
+            .border(1.dp, rowBorder, RoundedCornerShape(12.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Box(
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(if (isHighlighted) EmeraldPrimary else if (slot.isCurrent) GoldAccent else DarkSurfaceBorder)
+                    .background(
+                        if (isHighlighted) EmeraldPrimary
+                        else if (slot.isCurrent) GoldAccent
+                        else DarkSurfaceBorder
+                    )
             )
 
             Column {
                 Text(
                     text = slot.name,
                     color = nameColor,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Medium
                 )
                 if (isHighlighted) {
                     Text(
-                        text = "Sholat Berikutnya",
+                        text = "Berikutnya",
                         color = EmeraldPrimary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -226,19 +335,19 @@ fun PrayerTimeRow(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
                 text = slot.arabicName,
                 color = TextArabic,
                 fontFamily = FontFamily.Serif,
-                fontSize = 18.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = slot.time,
                 color = timeColor,
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold
             )
         }

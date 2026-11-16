@@ -20,7 +20,9 @@ data class PrayerUiState(
     val citySearchQuery: String = "",
     val searchResults: List<KotaDto> = emptyList(),
     val isSearching: Boolean = false,
-    val showCityDialog: Boolean = false
+    val showCityDialog: Boolean = false,
+    val isDetectingLocation: Boolean = false,
+    val locationMessage: String? = null
 )
 
 class PrayerViewModel(application: Application) : AndroidViewModel(application) {
@@ -117,5 +119,34 @@ class PrayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun closeCityDialog() {
         _uiState.update { it.copy(showCityDialog = false) }
+    }
+
+    fun autoDetectLocation() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDetectingLocation = true, locationMessage = "Mencari lokasi GPS terdekat...") }
+            repository.findCityByLocation(getApplication<Application>().applicationContext).fold(
+                onSuccess = { kota ->
+                    _uiState.update { current ->
+                        current.copy(
+                            isDetectingLocation = false,
+                            locationMessage = "Lokasi terdeteksi: ${kota.lokasi}"
+                        )
+                    }
+                    selectCity(kota)
+                },
+                onFailure = { err ->
+                    _uiState.update { current ->
+                        current.copy(
+                            isDetectingLocation = false,
+                            locationMessage = err.message ?: "Gagal mendeteksi lokasi"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun clearLocationMessage() {
+        _uiState.update { it.copy(locationMessage = null) }
     }
 }

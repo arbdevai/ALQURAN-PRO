@@ -1,6 +1,7 @@
 package com.alquran.pro.data.repository
 
 import android.content.Context
+import com.alquran.pro.data.location.LocationHelper
 import com.alquran.pro.data.model.JadwalResponse
 import com.alquran.pro.data.model.KotaDto
 import com.alquran.pro.data.model.KotaListResponse
@@ -82,6 +83,41 @@ class PrayerRepository(context: Context) {
             emit(Result.failure(e))
         }
     }.flowOn(Dispatchers.IO)
+
+    suspend fun findCityByLocation(context: Context): Result<KotaDto> = withContext(Dispatchers.IO) {
+        if (!LocationHelper.hasLocationPermission(context)) {
+            return@withContext Result.failure(Exception("Izin lokasi diperlukan untuk deteksi otomatis"))
+        }
+
+        val location = LocationHelper.getCurrentLocation(context)
+            ?: return@withContext Result.failure(Exception("Gagal mendeteksi koordinat GPS. Pastikan sensor lokasi aktif."))
+
+        val candidates = LocationHelper.resolveCitySearchCandidates(context, location)
+
+        for (candidate in candidates) {
+            try {
+                val response = api.searchKota(candidate)
+                if (response.status && response.data.isNotEmpty()) {
+                    val exactMatch = response.data.firstOrNull {
+                        it.lokasi.contains(candidate, ignoreCase = true)
+                    } ?: response.data.first()
+                    return@withContext Result.success(exactMatch)
+                }
+            } catch (_: Exception) {
+            }
+        }
+
+        val fallback = LocationHelper.findNearestMajorCity(location.latitude, location.longitude)
+        try {
+            val response = api.searchKota(fallback.name)
+            if (response.status && response.data.isNotEmpty()) {
+                return@withContext Result.success(response.data.first())
+            }
+        } catch (_: Exception) {
+        }
+
+        Result.failure(Exception("Lokasi terdekat belum tersedia dalam basis data MyQuran"))
+    }
 
     private fun parseJadwalToDashboard(
         cityId: String,
